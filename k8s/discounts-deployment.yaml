@@ -1,0 +1,67 @@
+# File: k8s/discounts-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discounts
+  namespace: chinmayee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discounts
+  template:
+    metadata:
+      labels:
+        app: discounts
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
+      containers:
+      - name: discounts
+        image: chinmayee606/restauranty-discounts:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-secret
+        - name: MONGODB_URI
+          value: "mongodb://mongodb:27017/flor"
+        - name: CLOUD_NAME
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: cloud-name
+        - name: CLOUD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: cloud-api-key
+        - name: CLOUD_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: cloud-api-secret
+        - name: PORT
+          value: "3002"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discounts
+  namespace: chinmayee
+spec:
+  selector:
+    app: discounts
+  ports:
+  - port: 3002
+    targetPort: 3002

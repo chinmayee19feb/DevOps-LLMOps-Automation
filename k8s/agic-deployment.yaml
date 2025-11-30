@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agic-chinmayee
+  namespace: kube-system
+  labels:
+    app: ingress-appgw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingress-appgw
+  template:
+    metadata:
+      labels:
+        app: ingress-appgw
+    spec:
+      containers:
+        - name: ingress-appgw
+          image: mcr.microsoft.com/azure-application-gateway/kubernetes-ingress:1.5.1
+          args:
+            - --ingress-class=azure-application-gateway
+            - --watch-namespace=chinmayee
+            - --subscription-id=daf9c53c-7096-4293-9bb1-f7ad8263db1a
+            - --resource-group=MC_k8-Chinmayee_cluster-chinmayee_westeurope
+            - --appgw-name=applicationgateway
+            - --use-private-ip=false
+            - --verbosity=3
+          env:
+            - name: AZURE_CLIENT_ID
+              value: "13b6eeed-33d6-4112-a96f-422785608174"
